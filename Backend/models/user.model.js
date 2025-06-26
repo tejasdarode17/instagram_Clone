@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema({
         unique: true,
     },
 
+    name: {
+        type: String,
+        required: true
+    },
+
     email: {
         type: String,
         required: true,
@@ -20,7 +25,7 @@ const userSchema = new mongoose.Schema({
 
     profilePicture: {
         type: String,
-        default: ""
+        default: "https://cdn-icons-png.flaticon.com/512/149/149071.png"
     },
 
     profilePictureID: {
@@ -49,9 +54,9 @@ const userSchema = new mongoose.Schema({
             ref: "User"
         }
     ],
-}, 
+},
 
-{ timestamps: true }
+    { timestamps: true }
 )
 
 
