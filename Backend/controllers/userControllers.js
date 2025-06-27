@@ -1,113 +1,135 @@
-import { User } from "../models/user.model.js";
+import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv"
-import { genrateJwtToken } from "../utils/genrateToken.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/genrateToken.js";
 import { uploadImage, deleteImage } from "../utils/imageHandler.js";
 
 dotenv.config()
 
 
-export async function SignUP(req, res) {
-
+export async function signUp(req, res) {
     try {
+        const { username, name, email, password } = req.body;
 
-        const { username, email, password, } = req.body
-
-        if (!username, !email, !password) {
-            return res.status(401).json({
-                message: "Something is Missing",
-                success: false
-            })
+        if (!username || !name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required",
+            });
         }
 
-        const existingUser = await User.findOne({ email });
-
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
         if (existingUser) {
-            return res.status(401).json({
-                message: "user is already registered with this email. Try with diffrent email",
-                success: false
-            })
+            return res.status(409).json({
+                success: false,
+                message: "Email already registered. Try logging in or use another email.",
+            });
         }
 
-        const hashedpassword = await bcrypt.hash(password, 10)
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await User.create({
             username,
+            name,
             email,
-            password: hashedpassword
-        })
+            password: hashedPassword,
+        });
 
-        const token = genrateJwtToken({ userID: existingUser._id })
+        const accessToken = generateAccessToken({ userID: newUser._id });
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            sameSite: "Strict",
+            path: '/',
+            maxAge: 15 * 60 * 1000,
+        });
+
+        const { password: _pw, ...sanitized } = newUser.toObject();
 
         return res.status(201).json({
-            message: "Account created Sucessfully",
-            token,
-            user: newUser,
-        })
-
-
-    } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+            success: true,
+            message: "Account created successfully",
+            user: sanitized,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message,
+        });
     }
-
 }
 
 export async function login(req, res) {
-
     try {
-        const { email, password } = req.body
+        const { email, password } = req.body;
 
-        if (!email, !password) {
-            return res.status(401).json({
-                message: "Something is Missing",
-                success: false
-            })
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required",
+                success: false,
+            });
         }
 
-        let user = await User.findOne({ email })
-
+        const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
             return res.status(401).json({
-                message: "Incorrect Email or password or User might not exist",
-                success: false
-            })
+                message: "Invalid email or password",
+                success: false,
+            });
         }
 
-        const isPasswordMatched = await bcrypt.compare(password, user.password)
-
+        const isPasswordMatched = await bcrypt.compare(password, user.password);
         if (!isPasswordMatched) {
             return res.status(401).json({
-                message: "Incorrect Email or password",
-                success: false
-            })
+                message: "Invalid email or password",
+                success: false,
+            });
         }
 
-        const token = await genrateJwtToken({ userID: user._id });
+        const accessToken = generateAccessToken({ userID: user._id });
 
+        const { password: _pw, ...sanitizedUser } = user.toObject();
 
-
-        return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', secure: true }).json({
-            message: "User Logged in sucessfully",
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            sameSite: "Strict",
+            path: '/',
+            maxAge: 15 * 60 * 1000,
+        }).status(200).json({
             success: true,
-            user: user
-        })
+            message: "User logged in successfully",
+            user: sanitizedUser,
+        });
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message,
+        });
     }
 }
 
-export async function logout(req, res) {
-
+export function logout(req, res) {
     try {
-        return res.cookie('token', "").json({
-            message: "User logout sucessfylly",
-            success: true
-        })
-    } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            sameSite: 'Strict',
+            path: '/',
+        });
+        return res.status(200).json({
+            success: true,
+            message: 'User logged out successfully'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: err.message
+        });
     }
-
 }
 
 export async function getUserByID(req, res) {
@@ -122,23 +144,22 @@ export async function getUserByID(req, res) {
             })
         }
 
-        const user = await User.findById(userID);
+        const user = await User.findById(userID).select("-password")
 
-        if (user) {
-            return res.status(401).json({
+        if (!user) {
+            return res.status(204).json({
                 message: "User not exist",
                 success: false
             })
         }
 
-
-        return res.status(201).json({
+        return res.status(200).json({
             message: "user fetched Sucessfuly",
             user
         })
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+        return res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 }
 
@@ -149,6 +170,14 @@ export async function editUser(req, res) {
         const image = req.file
         const userIDbyParam = req.params.id
         const userID = req.user.userID
+        console.log(userID);
+
+        if (!userID) {
+            return res.status(401).json({
+                success: false,
+                message: "Token not provided",
+            });
+        }
 
         if (userIDbyParam !== userID) {
             return res.status(403).json({
@@ -157,8 +186,7 @@ export async function editUser(req, res) {
             });
         }
 
-
-        const user = User.findById(userID)
+        const user = await User.findById(userID)
 
         let imageID = user.profilePictureID;
         let imageURL = user.profilePicture;
@@ -170,7 +198,7 @@ export async function editUser(req, res) {
                     await deleteImage(imageID)
                 }
                 const uploadedImage = await uploadImage(image.buffer)
-                imageURL = uploadedImage.secure_URL
+                imageURL = uploadedImage.secure_url
                 imageID = uploadedImage.public_id
             } catch (uploadErr) {
                 return res.status(500).json({
@@ -188,7 +216,7 @@ export async function editUser(req, res) {
         updatedData.profilePicture = imageURL
         updatedData.profilePictureID = imageID
 
-        const updatedUser = await User.findByIdAndUpdate(userID, updatedData, { new: true })
+        const updatedUser = await User.findByIdAndUpdate(userID, updatedData, { new: true }).select("-password")
 
         return res.status(200).json({
             success: true,
@@ -198,73 +226,70 @@ export async function editUser(req, res) {
 
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+        return res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 
 }
 
-export async function GetSuggestedUser(req, res) {
-
+export async function getSuggestedUser(req, res) {
     try {
-
-        const GetSuggestedUser = User.find().select("-password");
-
+        const suggestedUsers = await User.find().select("-password");
         return res.status(200).json({
             success: true,
             message: "Users Sucessfully fetched",
-            user: updatedUser
+            users: suggestedUsers
         })
-
-
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+        return res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
-
-
 }
 
 export async function followUnFollow(req, res) {
 
-    const userToBeFollowID = req.params.id;
-    const userID = req.user.userID;
+    try {
+        const userToBeFollowID = req.params.id;
+        const userID = req.user.userID;
 
-    const userToFollow = await User.findById(userToBeFollowID);
-    const user = await User.findById(userID)
+        const userToFollow = await User.findById(userToBeFollowID);
+        const user = await User.findById(userID)
 
 
-    if (!user) {
-        res.status(400).json({
-            success: false,
-            message: "your token is expired",
-        })
-    }
-    if (!userToFollow) {
-        res.status(400).json({
-            success: false,
-            message: "The user you trying to follow might not exist",
-        })
-    }
+        if (!user) {
+            res.status(400).json({
+                success: false,
+                message: "your token is expired",
+            })
+        }
+        if (!userToFollow) {
+            res.status(400).json({
+                success: false,
+                message: "The user you trying to follow might not exist",
+            })
+        }
 
-    if (userToFollow.followers.includes(userID)) {
-        await User.findByIdAndUpdate(userToBeFollowID, { $pull: { followers: userID } })
-        await User.findByIdAndUpdate(userID, { $pull: { following: userToBeFollowID } })
+        if (userToFollow.followers.includes(userID)) {
+            await User.findByIdAndUpdate(userToBeFollowID, { $pull: { followers: userID } })
+            await User.findByIdAndUpdate(userID, { $pull: { following: userToBeFollowID } })
 
-        const updatedUser = User.findById(userID);
+            const updatedUser = User.findById(userID);
 
-        return res.status(200).json({
-            success: true,
-            message: "you Unfollowed",
-            updatedUser
-        })
-    } else {
-        await User.findByIdAndUpdate(userToBeFollowID, { $push: { followers: userID } })
-        await User.findByIdAndUpdate(userID, { $push: { following: userToBeFollowID } })
-        const updatedUser = User.findById(userID);
+            return res.status(200).json({
+                success: true,
+                message: "you Unfollowed",
+                updatedUser
+            })
+        } else {
+            await User.findByIdAndUpdate(userToBeFollowID, { $push: { followers: userID } })
+            await User.findByIdAndUpdate(userID, { $push: { following: userToBeFollowID } })
+            const updatedUser = User.findById(userID);
 
-        return res.status(200).json({
-            success: true,
-            message: "you Unfollowed",
-            updatedUser
-        })
+            return res.status(200).json({
+                success: true,
+                message: "you Unfollowed",
+                updatedUser
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 }

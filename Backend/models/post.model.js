@@ -7,7 +7,11 @@ const postSchema = new mongoose.Schema({
         type: String,
     },
 
-    image: {
+    postImage: {
+        type: String,
+    },
+
+    postImageID: {
         type: String,
     },
 
@@ -35,5 +39,6 @@ const postSchema = new mongoose.Schema({
 
 )
 
+const Post = mongoose.model("Post", postSchema)
 
-export const Post = mongoose.model("Post", postSchema)
+export default Post

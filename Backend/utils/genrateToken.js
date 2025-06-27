@@ -3,7 +3,20 @@ import dotenv from "dotenv"
 dotenv.config
 
 
-export async function genrateJwtToken(payload) {
-    let token = JWT.sign(payload, process.env.JWT_SECRET_KEY);
-    return token
+export function generateAccessToken(payload) {
+    return JWT.sign(payload, process.env.JWT_SECRET_KEY, {
+        expiresIn: "15m",
+    });
+}
+
+export function generateRefreshToken(payload) {
+    return JWT.sign(payload, process.env.JWT_REFRESH_SECRET, {
+        expiresIn: "7d",
+    });
+}
+
+
+
+export async function verifyToken(params) {
+    // 
 }

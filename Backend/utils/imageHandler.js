@@ -21,7 +21,6 @@ export async function uploadImage(buffer) {
     }
 }
 
-
 export async function deleteImage(publicID) {
     try {
 
