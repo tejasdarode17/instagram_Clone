@@ -19,36 +19,33 @@ export async function createPost(req, res) {
         // }
 
         if (!user) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
                 message: "user not found",
             });
         }
 
-        let uploadedImage
+
+        let imageURL = ""
+        let imageID = ""
 
         if (image) {
             try {
-                uploadedImage = await uploadImage(image.buffer);
-            } catch (uploadErr) {
-                return res.status(500).json({
-                    success: false,
-                    message: "Image upload failed",
-                    error: uploadErr.message,
-                });
+                const uploaded = await uploadImage(image.buffer);
+                imageURL = uploaded.secure_url;
+                imageID = uploaded.public_id;
+            } catch (err) {
+                return res.status(500).json({ success: false, message: 'Image upload failed', error: err.message });
             }
         }
 
-        const newPost = Post.create({
+        const newPost = await Post.create({
             caption,
-            postImage: uploadedImage.secure_url,
-            postImageID: uploadedImage.public_id
+            postImage: imageURL,
+            postImageID: imageID,
+            author: userID
         })
 
-        if (user) {
-            user.posts.push(newPost._id)
-            await user.save()
-        }
 
         await User.findByIdAndUpdate(userID, { $addToSet: { posts: newPost._id } });
 

@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"
 import dbConnect from "./config/dbConnet.js"
 import userRoutes from "./routes/userRoutes.js"
 import postRoutes from "./routes/postRoutes.js"
+import cloudinaryConfig from "./config/cloudinary.js"
 
 
 const app = express()
@@ -24,6 +25,7 @@ app.use("/api/v1/", postRoutes)
 
 app.listen(PORT, () => {
     console.log("server is running");
-    dbConnect()
+    dbConnect();
+    cloudinaryConfig()
 })
 
