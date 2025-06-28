@@ -51,12 +51,12 @@ export async function createPost(req, res) {
 
         const populatedPost = await Post.findById(newPost._id).populate({
             path: "author",
-            select: "name username profilePicture"
+            select: "name profilePicture"
         })
 
         return res.status(200).json({
             success: true,
-            message: "Blog uploaded successfully",
+            message: "Post uploaded successfully",
             post: populatedPost
         });
 
@@ -69,3 +69,167 @@ export async function createPost(req, res) {
         });
     }
 }
+
+export async function getAllPosts(req, res) {
+
+    try {
+        const posts = await Post.find().sort({ createdAt: -1 })
+            .populate({
+                path: "author",
+                select: "name profilePicture"
+            }
+            ).populate({
+                path: "likes",
+                select: "name profilePicture"
+            })
+            .populate({
+                path: "comments",
+                sort: { createdAt: -1 },
+                populate: {
+                    path: "author",
+                    select: "name profilePicture"
+                }
+            })
+
+        return res.status(200).json({
+            message: "Fetched all the post successfully",
+            success: true,
+            posts
+        })
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message,
+        });
+    }
+}
+
+export async function getUserPosts(req, res) {
+
+    try {
+        const userID = req.user.userID;
+
+        if (!userID) {
+            return res.status(400).json({
+                success: false,
+                message: "User token Not Provided"
+            })
+        }
+
+        const posts = await Post.findById({ author: userID }).sort({ createdAt: -1 })
+            .populate({
+                path: "author",
+                select: "name profilePicture"
+            }
+            ).populate({
+                path: "likes",
+                select: "name profilePicture"
+            })
+            .populate({
+                path: "comments",
+                sort: { createdAt: -1 },
+                populate: {
+                    path: "author",
+                    select: "name profilePicture"
+                }
+            })
+
+
+        return res.status(200).json({
+            message: "Fetched all the post successfully",
+            success: true,
+            posts
+        })
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message,
+        });
+    }
+}
+
+export async function likePost(req, res) {
+    try {
+
+        const postID = req.params.id
+        const userID = req.user.userID
+
+        if (!postID || !userID) {
+            return res.status(400).json({
+                success: false,
+                message: "User token Not Provided or postID not received"
+            })
+        }
+
+        const post = await Post.findById(postID);
+
+        if (post.likes.includes(userID)) {
+            const updatedPost = await Post.findByIdAndUpdate(postID, { $pull: { likes: userID } }, { new: true })
+            return res.status(200).json({
+                success: true,
+                message: "Post Unliked",
+                updatedPost
+            })
+        } else {
+            const updatedPost = await Post.findByIdAndUpdate(postID, { $addToSet: { likes: userID } }, { new: true })
+            return res.status(200).json({
+                success: true,
+                message: "Post liked",
+                updatedPost
+            })
+        }
+
+    } catch (error) {
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message,
+        });
+    }
+}
+
+export async function deletePost(req, res) {
+
+    try {
+        const userID = req.user.userID
+        const postID = res.params.id
+
+        const post = await Post.findById(postID);
+
+        if (!post) {
+            return res.status(404).json({ success: false, message: "Blog not found" });
+        }
+
+        if (post.author.toString() !== userID) {
+            return res.status(400).json({
+                success: false,
+                message: "You are not authorize to delete this post"
+            })
+        }
+
+        await Post.findByIdAndDelete(postID)
+        await User.findByIdAndUpdate(userID, { $pull: { posts: postID } });
+
+        await Comment.deleteMany({ post: postID })
+
+        return res.status(200).json({
+            success: true,
+            message: "Post deleted Sucessfully",
+        })
+            
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message,
+        });
+    }
+}
+
+
