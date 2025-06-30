@@ -9,9 +9,9 @@ dotenv.config()
 
 export async function signUp(req, res) {
     try {
-        const { username, name, email, password } = req.body;
-
-        if (!username || !name || !email || !password) {
+        const { username, fullname, email, password } = req.body;
+       
+        if (!username || !fullname || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
@@ -30,7 +30,7 @@ export async function signUp(req, res) {
 
         const newUser = await User.create({
             username,
-            name,
+            name: fullname,
             email,
             password: hashedPassword,
         });

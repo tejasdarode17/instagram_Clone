@@ -1,7 +1,7 @@
 import Conversation from "../models/conversation.model.js"
 import { Message } from "../models/message.model.js"
 
-async function sendMessage() {
+export async function sendMessage() {
 
     try {
 

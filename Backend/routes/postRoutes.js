@@ -8,8 +8,8 @@ const route = express.Router();
 route.post("/post", upload.single("image"), verifyUser, createPost)
 route.get("/post", getAllPosts)
 route.get("/post/user", verifyUser, getUserPosts)
-route.post("/post/like", verifyUser, likePost)
-route.post("/post/delete", verifyUser, deletePost)
+route.post("/like/post/:id", verifyUser, likePost)
+route.post("/delete/post/:id", verifyUser, deletePost)
 
 
 export default route
