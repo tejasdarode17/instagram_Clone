@@ -2,35 +2,44 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
 
 const Login = () => {
     const [form, setForm] = useState({
         email: "",
         password: "",
-        username: "",
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const navigate = useNavigate()
 
-    const handleChange = (e) => {
+
+    function handleChange(e) {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
         setError("");
         setLoading(true);
 
         try {
             const { data } = await axios.post(
-                "http://localhost:3000/api/v1/signup",
+                "http://localhost:3000/api/v1/login",
                 form
             );
+            setForm({
+                email: "",
+                password: ""
+            })
 
-
+            toast.success("Everything working fine")
+            navigate("/home")
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || "Something went wrong");
@@ -68,9 +77,15 @@ const Login = () => {
                     </p>
                 )}
 
-                <Button type="submit" className="w-full pointer" disabled={loading}>
-                    {loading ? "Signing up…" : "Sign Up"}
-                </Button>
+                <div className="w-full">
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={loading}
+                    >
+                        {loading ? <Loader2 className="animate-spin" /> : "Login"}
+                    </Button>
+                </div>
             </form>
 
             <div className="max-w-xs text-center text-xs text-gray-500">

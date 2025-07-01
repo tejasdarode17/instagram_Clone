@@ -16,7 +16,9 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error("Not allowed by CORS"));
@@ -24,14 +26,17 @@ const corsOptions = {
     },
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: ["Set-Cookie"]
 };
 
-
-app.use(cors(corsOptions)); 
+app.use(cors(corsOptions));
 app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
+
 
 app.use("/api/v1/", userRoutes)
 app.use("/api/v1/", postRoutes)

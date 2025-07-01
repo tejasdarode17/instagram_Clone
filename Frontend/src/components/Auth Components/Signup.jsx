@@ -3,7 +3,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signup() {
     const [form, setForm] = useState({
@@ -15,19 +15,20 @@ export default function Signup() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const navigate = useNavigate()
 
-    const handleChange = (e) => {
+    function handleChange(e) {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
         setError("");
         setLoading(true);
 
         try {
-            const { data } = await axios.post("http://localhost:3000/api/v1/signup", form,
+            const data = await axios.post("http://localhost:3000/api/v1/signup", form,
                 { withCredentials: true }
             );
 
