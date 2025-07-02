@@ -12,8 +12,7 @@ const SideBar = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false)
   const navigate = useNavigate()
   const userData = useSelector((state) => state.auth.userData)
-  console.log(userData);
-
+  
 
   const sideBarItems = [
     { text: "Home", icon: <HomeIcon /> },
@@ -31,7 +30,6 @@ const SideBar = () => {
         </Avatar>
       )
     },
-
   ]
 
   async function logout() {
@@ -46,7 +44,6 @@ const SideBar = () => {
       console.log(error);
     }
   }
-
 
   function handleSidebar(i) {
     if (i.text === "Logout") {
@@ -70,9 +67,9 @@ const SideBar = () => {
         </div>
         <div>
           {
-            sideBarItems.map((item) => (
+            sideBarItems.map((item ,i) => (
 
-              <button onClick={() => handleSidebar(item)} className='w-full rounded-sm flex items-center gap-3 hover:bg-gray-100 p-3 pointer my-3'>
+              <button key={i} onClick={() => handleSidebar(item)} className='w-full rounded-sm flex items-center gap-3 hover:bg-gray-100 p-3 pointer my-3'>
                 <h1>{item.icon}</h1>
                 <h1>{item.text}</h1>
               </button>

@@ -7,6 +7,7 @@ import Comment from "./Comment";
 import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { setPostData } from "@/Redux/postSlice"
+import { toast } from "sonner"
 
 const Posts = () => {
     const dispatch = useDispatch()
@@ -17,7 +18,6 @@ const Posts = () => {
 
             const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/post`)
             const data = await response.data
-            console.log(data);
             dispatch(setPostData(data?.posts))
 
         } catch (error) {
@@ -34,7 +34,7 @@ const Posts = () => {
         <div className="flex flex-col gap-5">
             {
                 (posts || []).map((post) => (
-                    <div>
+                    <div key={post._id}>
                         <Post post={post}></Post>
                     </div>
                 ))
@@ -48,7 +48,23 @@ export default Posts
 
 export const Post = ({ post }) => {
 
+    const userData = useSelector(state => state.auth.userData)
     const [commetOpen, setCommentOpen] = useState(false)
+    const [isLiked, setIsLiked] = useState(post?.likes?.includes(userData?._id))
+    console.log(isLiked);
+
+
+    async function postLikeUnlike() {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/like/post/${post._id}`, {}, { withCredentials: true })
+            const data = await response.data
+            toast.success(data?.message)
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 
     return (
         <div className="w-full my-8 max-w-md">
@@ -80,7 +96,7 @@ export const Post = ({ post }) => {
 
             <div className="flex justify-between items-center my-2">
                 <div className="flex gap-2">
-                    <Heart className="pointer"></Heart>
+                    <Heart onClick={postLikeUnlike} className="pointer"></Heart>
                     <MessageCircle onClick={() => setCommentOpen(true)} className="pointer">
                     </MessageCircle>
                     <Send className="pointer" />
