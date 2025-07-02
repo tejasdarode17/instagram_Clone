@@ -31,15 +31,15 @@ export default function Signup() {
             const data = await axios.post("http://localhost:3000/api/v1/signup", form,
                 { withCredentials: true }
             );
-
             setForm({
                 email: "",
                 password: "",
                 fullname: "",
                 username: ""
             })
-
+            
             toast.success("everything is working fine")
+            navigate("/home")
 
         } catch (err) {
             console.error(err);

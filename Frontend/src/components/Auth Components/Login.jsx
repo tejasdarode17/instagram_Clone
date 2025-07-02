@@ -5,6 +5,8 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { setuserData } from "@/Redux/authSlice";
+import { useDispatch } from "react-redux";
 
 
 const Login = () => {
@@ -16,6 +18,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
 
     function handleChange(e) {
@@ -29,15 +32,20 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const { data } = await axios.post(
+            const response = await axios.post(
                 "http://localhost:3000/api/v1/login",
-                form
+                form,
+                { withCredentials: true }
             );
+
+            const data = await response.data
+
             setForm({
                 email: "",
                 password: ""
             })
-
+            console.log(data);
+            dispatch(setuserData(data?.user || null))
             toast.success("Everything working fine")
             navigate("/home")
         } catch (err) {

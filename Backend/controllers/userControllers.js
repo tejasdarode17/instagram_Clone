@@ -3,14 +3,13 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv"
 import { generateAccessToken, generateRefreshToken } from "../utils/genrateToken.js";
 import { uploadImage, deleteImage } from "../utils/imageHandler.js";
-
 dotenv.config()
 
 
 export async function signUp(req, res) {
     try {
         const { username, fullname, email, password } = req.body;
-       
+
         if (!username || !fullname || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -44,12 +43,10 @@ export async function signUp(req, res) {
             maxAge: 15 * 60 * 1000,
         });
 
-        const { password: _pw, ...sanitized } = newUser.toObject();
-
         return res.status(201).json({
             success: true,
             message: "Account created successfully",
-            user: sanitized,
+            user: newUser
         });
     } catch (err) {
         console.error(err);
@@ -90,9 +87,7 @@ export async function login(req, res) {
 
         const accessToken = generateAccessToken({ userID: user._id });
 
-        const { password: _pw, ...sanitizedUser } = user.toObject();
-
-        res.cookie("accessToken", accessToken, {
+        return res.cookie("accessToken", accessToken, {
             httpOnly: true,
             sameSite: "Strict",
             path: '/',
@@ -100,7 +95,7 @@ export async function login(req, res) {
         }).status(200).json({
             success: true,
             message: "User logged in successfully",
-            user: sanitizedUser,
+            user
         });
 
     } catch (error) {

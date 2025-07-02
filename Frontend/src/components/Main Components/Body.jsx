@@ -1,14 +1,13 @@
-import { Outlet } from "react-router-dom"
 import Feed from "./Feed/Feed"
 import RightSideBar from "./RightSideBar"
 
 const Body = () => {
   return (
-    <div className="flex">
-      <div className="flex flex-grow">
+    <div className="w-full flex">
+      <div className="w-full flex">
         <Feed></Feed>
       </div>
-      <RightSideBar></RightSideBar>
+        <RightSideBar></RightSideBar>
     </div>
   )
 }

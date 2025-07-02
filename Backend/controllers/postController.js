@@ -11,12 +11,12 @@ export async function createPost(req, res) {
 
         const user = await User.findById(userID);
 
-        // if (!image) {
-        //     return res.status(401).json({
-        //         success: false,
-        //         message: "Image Required",
-        //     });
-        // }
+        if (!image) {
+            return res.status(401).json({
+                success: false,
+                message: "Image Required",
+            });
+        }
 
         if (!user) {
             return res.status(404).json({
@@ -76,11 +76,11 @@ export async function getAllPosts(req, res) {
         const posts = await Post.find().sort({ createdAt: -1 })
             .populate({
                 path: "author",
-                select: "name profilePicture"
+                select: "name username profilePicture"
             }
             ).populate({
                 path: "likes",
-                select: "name profilePicture"
+                select: "name username profilePicture"
             })
             .populate({
                 path: "comments",

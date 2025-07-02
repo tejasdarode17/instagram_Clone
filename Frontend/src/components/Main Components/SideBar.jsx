@@ -1,13 +1,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { CreativeCommons, Heart, HomeIcon, LogOut, MessageCircle, MessagesSquare, PlusSquare, Search, TrendingUp } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
+import CreatePost from './CreatePost'
+import { useSelector } from 'react-redux'
 
 const SideBar = () => {
 
+  const [createPostOpen, setCreatePostOpen] = useState(false)
   const navigate = useNavigate()
+  const userData = useSelector((state) => state.auth.userData)
+  console.log(userData);
+
 
   const sideBarItems = [
     { text: "Home", icon: <HomeIcon /> },
@@ -20,7 +26,7 @@ const SideBar = () => {
     {
       text: "Profile", icon: (
         <Avatar>
-          <AvatarImage className='w-5 rounded-full' src="https://github.com/shadcn.png" />
+          <AvatarImage className='w-5 rounded-full' src={userData?.profilePicture} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       )
@@ -46,6 +52,9 @@ const SideBar = () => {
     if (i.text === "Logout") {
       logout()
     }
+    if (i.text === 'Create') {
+      setCreatePostOpen((prev) => prev = true)
+    }
   }
 
 
@@ -54,7 +63,7 @@ const SideBar = () => {
       <div className='flex flex-col gap-3'>
         <div className='flex items-center w-10 h-10 gap-2 mt-2'>
           <img
-            src="../../../public/logo.png"
+            src="logo.png"
             alt=""
             className='rounded-md' />
           <p className='italic font-bold'>Zingagram</p>
@@ -71,6 +80,7 @@ const SideBar = () => {
           }
         </div>
       </div>
+      <CreatePost open={createPostOpen} close={setCreatePostOpen} ></CreatePost>
     </div>
   )
 }
