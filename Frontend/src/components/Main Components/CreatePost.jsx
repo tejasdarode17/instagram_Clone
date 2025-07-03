@@ -100,7 +100,7 @@ const CreatePost = ({ open, close }) => {
                                 accept='.png, .jpeg, .jpg'
                                 onChange={(e) => setUserInput((prev) => ({ ...prev, image: e.target.files[0] }))}
                             />
-                            <Button onClick={addPost} className='w-full text-white pointer'>
+                            <Button onClick={addPost} className='w-full pointer'>
                                 {
                                     loading ? <Loader2 className='animate-spin'></Loader2> : "Post"
                                 }

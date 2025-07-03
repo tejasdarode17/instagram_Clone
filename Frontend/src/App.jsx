@@ -4,6 +4,7 @@ import Login from "./components/Auth Components/Login"
 import SideBar from "./components/Main Components/SideBar"
 import Body from "./components/Main Components/Body"
 import Profile from "./components/Main Components/Profile"
+import { ThemeProvider } from "./components/Dark Mode/Theme-provider"
 
 
 
@@ -18,7 +19,7 @@ function AuthLayout() {
 
 function MainLayout() {
   return (
-    <div className="flex bg-[#000000] text-white">
+    <div className="flex">
       <SideBar />
       <div className="flex-1">
         <Outlet />
@@ -62,7 +63,9 @@ function App() {
 
   return (
     <>
-      <RouterProvider router={approuter} > </RouterProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <RouterProvider router={approuter} > </RouterProvider>
+      </ThemeProvider>
     </>
   )
 }

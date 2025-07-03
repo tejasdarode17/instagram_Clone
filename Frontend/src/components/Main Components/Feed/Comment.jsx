@@ -26,7 +26,7 @@ const Comment = ({ open, setCommentOpen, post }) => {
         <Dialog open={open} onOpenChange={setCommentOpen}>
             <DialogContent className="flex border-none gap-0 outline-none min-w-[70vw] min-h-[80vh] max-h-[80vh] p-0 overflow-hidden">
                 {/*Left - image*/}
-                <div className="flex-1 bg-black flex items-center justify-center">
+                <div className="flex-1  flex items-center justify-center">
                     <img
                         src={post?.postImage}
                         alt="Post"
@@ -35,7 +35,7 @@ const Comment = ({ open, setCommentOpen, post }) => {
                 </div>
 
                 {/* Righ comments & caption */}
-                <div className="flex-1 bg-[#212328] text-white flex flex-col p-4 overflow-y-auto">
+                <div className="flex-1  flex flex-col p-4 overflow-y-auto">
                     {/* author row */}
                     <div className="flex items-center gap-2 mb-2">
                         <Avatar>
@@ -67,7 +67,7 @@ const Comment = ({ open, setCommentOpen, post }) => {
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                     <p className="font-medium text-sm">{c?.author?.username}</p>
-                                    <p className="text-sm text-white">{c?.text}</p>
+                                    <p className="text-sm">{c?.text}</p>
                                     <Dialog >
                                         <DialogTrigger asChild>
                                             <MoreHorizontal className='pointer'></MoreHorizontal>

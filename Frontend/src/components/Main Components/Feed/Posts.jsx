@@ -24,7 +24,7 @@ const Posts = () => {
             console.log(error);
         }
     }
-    
+
     useEffect(() => {
         getAllPosts()
     }, [])
@@ -93,10 +93,10 @@ export const Post = ({ post }) => {
                             <MoreHorizontal className="h-5 w-5 cursor-pointer" />
                         </button>
                     </DialogTrigger>
-                    <DialogContent className="w-100 p-2 bg-[#262626] outline-none border-none">
+                    <DialogContent className="w-100 p-2  outline-none border-none">
                         <Button className="w-fit mx-auto text-red-600 pointer hover:bg-[#181818] border-red-600 border-2" variant={Ghost} >Unfollow</Button>
                         <Button className="w-fit mx-auto text-red-600 pointer hover:bg-[#181818]" variant={Ghost} >Report</Button>
-                        <Button className="w-fit mx-auto text-white  pointer hover:bg-[#181818]" variant={Ghost} >Save</Button>
+                        <Button className="w-fit mx-auto  pointer hover:bg-[#181818]" variant={Ghost} >Save</Button>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -129,7 +129,7 @@ export const Post = ({ post }) => {
                 </p>
                 <Comment post={post} open={commetOpen} setCommentOpen={setCommentOpen}  ></Comment>
                 <div className="flex justify-between items-center">
-                    <input  value={commetText} onChange={(e) => setCommentText(e.target.value)} type="text" placeholder="add a comment" className="focus:outline-none w-full" />
+                    <input value={commetText} onChange={(e) => setCommentText(e.target.value)} type="text" placeholder="add a comment" className="focus:outline-none w-full" />
                     {commetText.length > 0 && <button onClick={(e) => addComment(e)} className="pointer text-red-700" >Post</button>}
                 </div>
             </div>
