@@ -3,6 +3,7 @@ import Signup from "./components/Auth Components/Signup"
 import Login from "./components/Auth Components/Login"
 import SideBar from "./components/Main Components/SideBar"
 import Body from "./components/Main Components/Body"
+import Profile from "./components/Main Components/Profile"
 
 
 
@@ -14,16 +15,17 @@ function AuthLayout() {
   )
 }
 
+
 function MainLayout() {
   return (
-    <>
-      <SideBar></SideBar>
-      <Outlet></Outlet>
-    </>
-  )
+    <div className="flex bg-[#000000] text-white">
+      <SideBar />
+      <div className="flex-1">
+        <Outlet />
+      </div>
+    </div>
+  );
 }
-
-
 
 
 const approuter = createBrowserRouter([
@@ -41,12 +43,15 @@ const approuter = createBrowserRouter([
       }
     ]
   }, {
-    path: "/home",
     element: <MainLayout></MainLayout>,
     children: [
       {
         path: "/home",
         element: <Body></Body>
+      },
+      {
+        path: '/profile/:id',
+        element: <Profile></Profile>
       }
     ]
   }

@@ -43,6 +43,13 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female']
     },
 
+    posts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Post"
+        }
+    ],
+
     followers: [
         {
             type: mongoose.Schema.Types.ObjectId,

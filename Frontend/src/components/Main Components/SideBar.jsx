@@ -12,7 +12,7 @@ const SideBar = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false)
   const navigate = useNavigate()
   const userData = useSelector((state) => state.auth.userData)
-  
+
 
   const sideBarItems = [
     { text: "Home", icon: <HomeIcon /> },
@@ -52,11 +52,14 @@ const SideBar = () => {
     if (i.text === 'Create') {
       setCreatePostOpen((prev) => prev = true)
     }
+    if (i.text === 'Profile') {
+      navigate(`/profile/${userData._id}`)
+    }
   }
 
 
   return (
-    <div className='fixed top-0 left-0 z-10 px-4 w-[16%] h-screen  border border-r border-gray-500'>
+    <div className='fixed top-0 left-0 z-10 px-4 w-[16%] h-screen  border-r border-gray-500'>
       <div className='flex flex-col gap-3'>
         <div className='flex items-center w-10 h-10 gap-2 mt-2'>
           <img
@@ -67,9 +70,9 @@ const SideBar = () => {
         </div>
         <div>
           {
-            sideBarItems.map((item ,i) => (
+            sideBarItems.map((item, i) => (
 
-              <button key={i} onClick={() => handleSidebar(item)} className='w-full rounded-sm flex items-center gap-3 hover:bg-gray-100 p-3 pointer my-3'>
+              <button key={i} onClick={() => handleSidebar(item)} className='w-full rounded-sm flex items-center gap-3 hover:bg-gray-800 p-3 pointer my-3'>
                 <h1>{item.icon}</h1>
                 <h1>{item.text}</h1>
               </button>

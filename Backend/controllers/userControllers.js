@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv"
+import mongoose from "mongoose";
 import { generateAccessToken, generateRefreshToken } from "../utils/genrateToken.js";
 import { uploadImage, deleteImage } from "../utils/imageHandler.js";
 dotenv.config()
@@ -40,7 +41,7 @@ export async function signUp(req, res) {
             httpOnly: true,
             sameSite: "Strict",
             path: '/',
-            maxAge: 15 * 60 * 1000,
+            maxAge: 24 * 60 * 60 * 1000,
         });
 
         return res.status(201).json({
@@ -91,11 +92,11 @@ export async function login(req, res) {
             httpOnly: true,
             sameSite: "Strict",
             path: '/',
-            maxAge: 15 * 60 * 1000,
+            maxAge: 24 * 60 * 60 * 1000,
         }).status(200).json({
             success: true,
             message: "User logged in successfully",
-            user
+            user,
         });
 
     } catch (error) {
@@ -139,7 +140,7 @@ export async function getUserByID(req, res) {
             })
         }
 
-        const user = await User.findById(userID).select("-password")
+        const user = await User.findById(userID)
 
         if (!user) {
             return res.status(204).json({
@@ -226,18 +227,39 @@ export async function editUser(req, res) {
 
 }
 
-export async function getSuggestedUser(req, res) {
+export const getSuggestedUsers = async (req, res) => {
     try {
-        const suggestedUsers = await User.find().select("-password");
+
+        const loggedInId = req.user?.userID
+
+        if (!loggedInId) {
+            return res.status(400).json({ success: false, message: "Missing user ID" });
+        }
+
+        const me = await User.findById(loggedInId).select("following");
+        const excludeIds = [...me.following, loggedInId].map(
+            id => new mongoose.Types.ObjectId(id)
+        );
+
+        const suggestions = await User.aggregate([
+            { $match: { _id: { $nin: excludeIds } } },
+            { $sample: { size: 5 } },
+            { $project: { password: 0 } }
+        ]);
+
         return res.status(200).json({
             success: true,
-            message: "Users Sucessfully fetched",
-            users: suggestedUsers
-        })
-    } catch (error) {
-        return res.status(500).json({ success: false, message: 'Server error', error: error.message });
+            message: "Users successfully fetched",
+            users: suggestions,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message
+        });
     }
-}
+};
 
 export async function followUnFollow(req, res) {
 
@@ -288,3 +310,5 @@ export async function followUnFollow(req, res) {
         return res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 }
+
+

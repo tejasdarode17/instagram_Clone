@@ -1,5 +1,5 @@
 import express from "express"
-import { signUp, login, logout, getUserByID, getSuggestedUser, followUnFollow, editUser } from "../controllers/userControllers.js";
+import { signUp, login, logout, getUserByID, getSuggestedUsers, followUnFollow, editUser } from "../controllers/userControllers.js";
 import verifyUser from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
 
@@ -10,7 +10,7 @@ route.post("/signup", signUp);
 route.post("/login", login);
 route.get("/logout", logout);
 route.get("/user/:id", getUserByID);
-route.get("/suggestion/user", getSuggestedUser);
+route.get("/suggestion/user", verifyUser, getSuggestedUsers);
 route.post("/user/follow/:id", verifyUser, followUnFollow);
 route.post("/user/edit/:id", upload.single("profilePicture"), verifyUser, editUser);
 

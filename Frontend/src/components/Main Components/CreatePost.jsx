@@ -5,6 +5,8 @@ import { Ghost, Loader2, Upload } from 'lucide-react'
 import { Button } from '../ui/button'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { useDispatch, useSelector } from 'react-redux'
+import { setPostData } from '@/Redux/postSlice'
 
 const CreatePost = ({ open, close }) => {
 
@@ -14,6 +16,7 @@ const CreatePost = ({ open, close }) => {
     })
 
     const [loading, setLoading] = useState(false)
+    const postData = useSelector(state => state.posts.postData)
 
     useEffect(() => {
         return () => {
@@ -23,6 +26,7 @@ const CreatePost = ({ open, close }) => {
         }
     }, [userInput.image])
 
+    const dispatch = useDispatch()
 
     async function addPost() {
         try {
@@ -40,6 +44,11 @@ const CreatePost = ({ open, close }) => {
                 caption: "",
                 image: ""
             })
+
+            console.log(data);
+
+            dispatch(setPostData([data?.post, ...postData]))
+
         } catch (error) {
             console.log(error);
         } finally {

@@ -28,16 +28,18 @@ export default function Signup() {
         setLoading(true);
 
         try {
-            const data = await axios.post("http://localhost:3000/api/v1/signup", form,
+            const response = await axios.post("http://localhost:3000/api/v1/signup", form,
                 { withCredentials: true }
             );
+
+            const data = response.data
             setForm({
                 email: "",
                 password: "",
                 fullname: "",
                 username: ""
             })
-            
+
             toast.success("everything is working fine")
             navigate("/home")
 

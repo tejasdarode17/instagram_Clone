@@ -3,14 +3,12 @@ import RightSideBar from "./RightSideBar"
 
 const Body = () => {
   return (
-    <div className="w-full flex">
-      <div className="w-full flex">
-        <Feed></Feed>
-      </div>
-        <RightSideBar></RightSideBar>
+    <div>
+      <Feed />
+      <RightSideBar />
     </div>
-  )
-}
+  );
+};
 
 export default Body
 

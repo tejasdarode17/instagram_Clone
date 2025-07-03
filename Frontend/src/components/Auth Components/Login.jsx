@@ -38,7 +38,7 @@ const Login = () => {
                 { withCredentials: true }
             );
 
-            const data = await response.data
+            const data = response.data
 
             setForm({
                 email: "",

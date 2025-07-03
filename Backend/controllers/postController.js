@@ -46,12 +46,11 @@ export async function createPost(req, res) {
             author: userID
         })
 
-
         await User.findByIdAndUpdate(userID, { $addToSet: { posts: newPost._id } });
 
         const populatedPost = await Post.findById(newPost._id).populate({
             path: "author",
-            select: "name profilePicture"
+            select: "name username profilePicture"
         })
 
         return res.status(200).json({
@@ -87,7 +86,7 @@ export async function getAllPosts(req, res) {
                 sort: { createdAt: -1 },
                 populate: {
                     path: "author",
-                    select: "name profilePicture"
+                    select: "name username profilePicture"
                 }
             })
 
@@ -159,6 +158,11 @@ export async function likePost(req, res) {
         const postID = req.params.id
         const userID = req.user.userID
 
+        console.log(userID);
+        console.log("hello");
+
+
+
         if (!postID || !userID) {
             return res.status(400).json({
                 success: false,
@@ -222,7 +226,7 @@ export async function deletePost(req, res) {
             success: true,
             message: "Post deleted Sucessfully",
         })
-            
+
     } catch (error) {
         return res.status(500).json({
             success: false,

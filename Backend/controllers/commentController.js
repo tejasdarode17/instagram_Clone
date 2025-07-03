@@ -1,14 +1,14 @@
 import Post from "../models/post.model.js";
-import User from "../models/user.model.js";
 import Comment from "../models/comment.model.js";
 
 
 export async function addComment(req, res) {
 
     try {
-        const userID = req.User.userID
+        const userID = req.user.userID
         const postID = req.params.id
         const { comment } = req.body
+
 
         if (!postID || !userID) {
             return res.status(400).json({
@@ -17,30 +17,30 @@ export async function addComment(req, res) {
             })
         }
 
+        if (!comment) {
+            return res.status(400).json({
+                success: false,
+                message: "comment not provided"
+            })
+        }
 
         const newComment = await Comment.create({
             text: comment,
             author: userID,
             post: postID
-        }).populate({
-            path: "author",
-            select: "name profilePhoto"
         })
 
-        const post = await Post.findByIdAndUpdate(postID, { $addToSet: { comments: newComment._id } })
-            .populate({
-                path: "comments",
-                populate: {
-                    path: "author",
-                    select: "name profilePhoto",
-                }
-            })
+        const populatedComment = await newComment.populate({
+            path: "author",
+            select: "username , profilePicture , name"
+        })
+
+        await Post.findByIdAndUpdate(postID, { $addToSet: { comments: newComment._id } })
 
         return res.status(200).json({
             success: true,
             message: "commented successfully",
-            comment: newComment,
-            post
+            comment: populatedComment,
         })
 
     } catch (error) {
