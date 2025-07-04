@@ -57,6 +57,9 @@ const SideBar = () => {
     if (i.text === 'Profile') {
       navigate(`/profile/${userData._id}`)
     }
+    if (i.text === 'Home') {
+      navigate(`/home`)
+    }
   }
 
 
