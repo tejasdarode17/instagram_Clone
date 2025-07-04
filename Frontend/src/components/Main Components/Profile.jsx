@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { Button } from '../ui/button';
 import { Settings } from 'lucide-react';
@@ -10,21 +10,22 @@ import { setUserProfile } from '@/Redux/authSlice';
 
 const Profile = () => {
     const userData = useSelector(state => state.auth.userData)
-    const userProfile = useSelector(state => state.auth.userData)
+    const userProfile = useSelector(state => state.auth.userProfile)
     const [active, setActive] = useState("Posts")
     const [loading, setLoading] = useState(false)
     const { id } = useParams();
-    const { followUser, followData, isFollowing } = useFollow()
+    const { followUser, isFollowing } = useFollow()
     const dispatch = useDispatch()
 
-    const loggedinUserProfile = userProfile._id == userData?._id
+    const loggedinUserProfile = userProfile?._id === userData?._id
+
 
 
     async function getUserProfileData() {
         try {
             setLoading(true)
             const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/${id} `)
-            const data = response.data
+            const data = response?.data
 
             dispatch(setUserProfile(data?.user || {}))
 
@@ -33,10 +34,6 @@ const Profile = () => {
         } finally {
             setLoading(false)
         }
-    }
-
-    async function follow() {
-        await followUser(userProfile._id)
     }
 
     useEffect(() => {
@@ -56,10 +53,10 @@ const Profile = () => {
                     <Avatar className="w-36 h-36 md:w-40 md:h-40">
                         <AvatarImage
                             className="object-cover w-full h-full rounded-full"
-                            src={userProfile?.profilePic || "https://github.com/shadcn.png"}
+                            src={userProfile?.profilePicture || "https://github.com/shadcn.png"}
                         />
                         <AvatarFallback>
-                            {userProfile?.username?.slice(0, 2)?.toUpperCase() || "UN"}
+                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" />
                         </AvatarFallback>
                     </Avatar>
 
@@ -75,24 +72,22 @@ const Profile = () => {
 
                                     loggedinUserProfile ? (
                                         <>
-                                            <Button variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
-                                                Edit Profile
-                                            </Button>
+                                            <Link to={`/profile/edit/${userProfile._id}`}>
+                                                <Button variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
+                                                    Edit Profile
+                                                </Button>
+                                            </Link>
                                             <Settings className="w-5 h-5 mt-1.5 pointer" />
                                         </>
                                     ) : (
                                         <>
-                                            {
-                                                isFollowing ? (
-                                                    <Button onClick={follow} variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
-                                                        Following
-                                                    </Button>
-                                                ) : (
-                                                    <Button onClick={follow} variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
-                                                        Follow
-                                                    </Button>
-                                                )
-                                            }
+                                            <Button
+                                                onClick={() => followUser(userProfile?._id)}
+                                                variant="ghost"
+                                                className="border border-gray-400 px-4 py-1 text-sm"
+                                            >
+                                                {isFollowing ? "Following" : "Follow"}
+                                            </Button>
                                             <Button variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
                                                 Message
                                             </Button>
@@ -148,14 +143,9 @@ const Profile = () => {
 
 
 
-
-
-
 const UserPosts = ({ userProfile, active, loading }) => {
 
     const displayPost = userProfile?.posts || [];
-
-
 
     if (active === "Reels") {
         return (

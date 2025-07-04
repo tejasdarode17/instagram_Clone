@@ -215,7 +215,12 @@ export async function editUser(req, res) {
         updatedData.profilePicture = imageURL
         updatedData.profilePictureID = imageID
 
-        const updatedUser = await User.findByIdAndUpdate(userID, updatedData, { new: true }).select("-password")
+        const updatedUser = await User.findByIdAndUpdate(userID, updatedData, { new: true }).populate(
+            {
+                path: "posts",
+                select: "caption postImage author likes comments"
+            }
+        )
 
         return res.status(200).json({
             success: true,
@@ -269,7 +274,7 @@ export async function followUnFollow(req, res) {
     try {
         const userToBeFollowID = req.params.id;
         const userID = req.user.userID;
-    
+
         const userToFollow = await User.findById(userToBeFollowID);
         const user = await User.findById(userID)
 
@@ -289,24 +294,18 @@ export async function followUnFollow(req, res) {
         if (userToFollow.followers.includes(userID)) {
             await User.findByIdAndUpdate(userToBeFollowID, { $pull: { followers: userID } })
             await User.findByIdAndUpdate(userID, { $pull: { following: userToBeFollowID } })
-
-            const updatedUser = await User.findById(userID);
-
             return res.status(200).json({
                 success: true,
                 message: "you Unfollowed",
-                updatedUser
+
             })
         } else {
             await User.findByIdAndUpdate(userToBeFollowID, { $push: { followers: userID } })
             await User.findByIdAndUpdate(userID, { $push: { following: userToBeFollowID } })
-
-            const updatedUser = await User.findById(userID);
-
             return res.status(200).json({
                 success: true,
                 message: "you followed",
-                updatedUser
+
             })
         }
     } catch (error) {

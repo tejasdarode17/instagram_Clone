@@ -8,6 +8,7 @@ import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { setPostData, updatePostComments, updatePostLikes } from "@/Redux/postSlice"
 import { toast } from "sonner"
+import { Link } from "react-router-dom"
 
 const Posts = () => {
     const dispatch = useDispatch()
@@ -15,7 +16,6 @@ const Posts = () => {
 
     async function getAllPosts() {
         try {
-
             const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/post`)
             const data = response.data
             dispatch(setPostData(data?.posts))
@@ -44,7 +44,7 @@ const Posts = () => {
 
 export const Post = ({ post }) => {
 
-    const userData = useSelector(state => state.auth.userData)
+    const userData = useSelector(state => state?.auth?.userData)
     const [commetOpen, setCommentOpen] = useState(false)
     const [commetText, setCommentText] = useState("")
     const [isLiked, setIsLiked] = useState(post?.likes?.includes(userData?._id))
@@ -77,15 +77,22 @@ export const Post = ({ post }) => {
         }
     }
 
+    console.log(post);
+
+
     return (
         <div className="w-[40vw] my-8">
             <div className="flex items-center my-1 justify-between">
                 <div className="flex gap-2 items-center mb-1">
-                    <Avatar>
-                        <AvatarImage className="w-8 h-8 rounded-full" src={post?.author?.profilePicture} />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <h1>{post?.author?.username}</h1>
+                    <Link to={`/profile/${post?.author?._id}`}>
+                        <Avatar>
+                            <AvatarImage className="w-8 h-8 rounded-full" src={post?.author?.profilePicture} />
+                            <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+                    </Link>
+                    <Link to={`/profile/${post?.author?._id}`}>
+                        <h1>{post?.author?.username}</h1>
+                    </Link>
                 </div>
                 <Dialog>
                     <DialogTrigger asChild>

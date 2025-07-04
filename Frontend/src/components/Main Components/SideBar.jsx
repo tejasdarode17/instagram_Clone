@@ -55,7 +55,7 @@ const SideBar = () => {
       setCreatePostOpen((prev) => prev = true)
     }
     if (i.text === 'Profile') {
-      navigate(`/profile/${userData._id}`)
+      navigate(`/profile/${userData?._id}`)
     }
     if (i.text === 'Home') {
       navigate(`/home`)
@@ -85,7 +85,7 @@ const SideBar = () => {
           }
         </div>
       </div>
-      <ModeToggle></ModeToggle>
+      
       <CreatePost open={createPostOpen} close={setCreatePostOpen} ></CreatePost>
     </div>
   )

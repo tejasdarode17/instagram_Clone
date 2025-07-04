@@ -5,10 +5,7 @@ import SideBar from "./components/Main Components/SideBar"
 import Body from "./components/Main Components/Body"
 import Profile from "./components/Main Components/Profile"
 import { ThemeProvider } from "./components/Dark Mode/Theme-provider"
-
-
-
-
+import EditProfile from "./components/Main Components/EditProfile"
 
 function AuthLayout() {
   return (
@@ -53,6 +50,10 @@ const approuter = createBrowserRouter([
       {
         path: '/profile/:id',
         element: <Profile></Profile>
+      },
+      {
+        path: '/profile/edit/:id',
+        element: <EditProfile></EditProfile>
       }
     ]
   }

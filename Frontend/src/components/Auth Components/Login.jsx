@@ -1,118 +1,125 @@
 import { useState } from "react";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import { setuserData } from "@/Redux/authSlice";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useDispatch } from "react-redux";
+import { setuserData } from "@/Redux/authSlice";
 
-
-const Login = () => {
-    const [form, setForm] = useState({
-        email: "",
-        password: "",
-    });
-
+export default function Login() {
+    const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
+    const [showPw, setShowPw] = useState(false);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
 
     function handleChange(e) {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-    };
+        setForm({ ...form, [e.target.name]: e.target.value });
+    }
 
     async function handleSubmit(e) {
         e.preventDefault();
-        setError("");
-        setLoading(true);
+        setLoading(true); setError("");
 
         try {
-            const response = await axios.post(
+            const { data } = await axios.post(
                 "http://localhost:3000/api/v1/login",
                 form,
                 { withCredentials: true }
             );
-
-            const data = response.data
-
-            setForm({
-                email: "",
-                password: ""
-            })
-            console.log(data);
-            dispatch(setuserData(data?.user || null))
-            toast.success("Everything working fine")
-            navigate("/home")
+            dispatch(setuserData(data?.user));
+            toast.success("Welcome back!");
+            navigate("/home");
         } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.message || "Something went wrong");
+            const msg = err.response?.data?.message || "Login failed";
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
-    };
+    }
 
+    // ────────────────────────────────────────── ui
     return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4">
             <form
                 onSubmit={handleSubmit}
-                className="flex w-full max-w-md flex-col items-center gap-4"
+                className="w-full max-w-md space-y-6 rounded-xl bg-card p-6 shadow-md dark:shadow-none"
             >
-                <p className="text-3xl font-semibold">Zingagram</p>
+                <h1 className="text-center text-3xl font-semibold tracking-tight">
+                    Zingagram
+                </h1>
 
-                <Input
-                    autoFocus
-                    name="email"
-                    type="email"
-                    placeholder="Email or username"
-                    value={form.email}
-                    onChange={handleChange}
-                />
-                <Input
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                />
+                {/* Email */}
+                <div className="space-y-1">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={form.email}
+                        onChange={handleChange}
+                        className="bg-muted/20 focus:bg-muted/30"
+                        autoFocus
+                    />
+                </div>
+
+                {/* Password with show / hide */}
+                <div className="space-y-1">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                        <Input
+                            id="password"
+                            name="password"
+                            type={showPw ? "text" : "password"}
+                            placeholder="••••••••"
+                            value={form.password}
+                            onChange={handleChange}
+                            className="pr-10 bg-muted/20 focus:bg-muted/30"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPw((p) => !p)}
+                            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
+                            tabIndex={-1}
+                        >
+                            {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+                </div>
+
                 {error && (
-                    <p className="w-full rounded bg-red-50 p-2 text-center text-sm text-red-600">
+                    <p className="rounded bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
                         {error}
                     </p>
                 )}
 
-                <div className="w-full">
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={loading}
-                    >
-                        {loading ? <Loader2 className="animate-spin" /> : "Login"}
-                    </Button>
-                </div>
+                <Button type="submit" variant='ghost' className="w-full pointer bg-[#020618] border border-gray-400" disabled={loading}>
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
+                </Button>
+
+                <p className="text-center text-xs text-muted-foreground">
+                    This is a clone. By continuing, you agree to our&nbsp;
+                    <span className="underline">Terms</span> &nbsp;and&nbsp;
+                    <span className="underline">Privacy</span>.
+                </p>
             </form>
 
-            <div className="max-w-xs text-center text-xs text-gray-500">
-                <p>This is just a clone.</p>
-                <p>
-                    By signing up, you agree to our Terms, Privacy Policy and Cookies
-                    Policy.
-                </p>
-            </div>
-
-            <div className="mt-6 flex items-center">
-                <span className="text-sm">Don't Have account?</span>
-                <Link to={"/signup"}>
-                    <Button variant="link " className="pointer">Sign UP</Button>
+            <div className="flex items-center gap-1 text-sm">
+                <span>No account yet?</span>
+                <Link to="/signup">
+                    <Button variant="link" className="h-auto p-0 text-primary pointer hover:text-blue-700">
+                        Sign up
+                    </Button>
                 </Link>
             </div>
         </div>
     );
 }
-
-
-export default Login

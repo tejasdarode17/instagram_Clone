@@ -30,11 +30,15 @@ const RightSideBar = () => {
         <div className='xl:absolute right-0 top-0 Z-10 h-screen w-[25%] overflow-x-hidden overflow-y-auto'>
             <div className='my-5 flex flex-col gap-5'>
                 <div className='flex items-center gap-5' key={userData.id + Math.random()}>
-                    <Avatar>
-                        <AvatarImage className="w-15 h-15 rounded-full" src={userData?.profilePicture} />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <p>{userData?.username}</p>
+                    <Link to={`/profile/${userData?._id}`}>
+                        <Avatar>
+                            <AvatarImage className="w-8 h-8 rounded-full" src={userData?.profilePicture} />
+                            <AvatarFallback>img</AvatarFallback>
+                        </Avatar>
+                    </Link>
+                    <Link to={`/profile/${userData?._id}`}>
+                        <h1>{userData?.username}</h1>
+                    </Link>
                 </div>
                 <p className='text-sm'>Suggested for you</p>
             </div>
