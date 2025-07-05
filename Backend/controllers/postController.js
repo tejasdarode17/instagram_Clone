@@ -158,11 +158,6 @@ export async function likePost(req, res) {
         const postID = req.params.id
         const userID = req.user.userID
 
-        console.log(userID);
-        console.log("hello");
-
-
-
         if (!postID || !userID) {
             return res.status(400).json({
                 success: false,

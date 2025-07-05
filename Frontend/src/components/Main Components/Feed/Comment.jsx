@@ -40,7 +40,7 @@ const Comment = ({ open, setCommentOpen, post }) => {
                     <div className="flex items-center gap-2 mb-2">
                         <Avatar>
                             <AvatarImage
-                                className="w-8 h-8 rounded-full"
+                                className="w-8 h-8 rounded-full object-cover"
                                 src={post?.author?.profilePicture}
                             />
                             <AvatarFallback>CN</AvatarFallback>
@@ -61,7 +61,7 @@ const Comment = ({ open, setCommentOpen, post }) => {
                                 <div key={c._id} className="flex items-center gap-3">
                                     <Avatar>
                                         <AvatarImage
-                                            className="w-8 h-8 rounded-full"
+                                            className="w-8 h-8 rounded-full object-cover"
                                             src={c?.author?.profilePicture}
                                         />
                                         <AvatarFallback>CN</AvatarFallback>

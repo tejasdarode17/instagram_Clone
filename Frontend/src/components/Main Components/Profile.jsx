@@ -84,7 +84,7 @@ const Profile = () => {
                                             <Button
                                                 onClick={() => followUser(userProfile?._id)}
                                                 variant="ghost"
-                                                className="border border-gray-400 px-4 py-1 text-sm"
+                                                className="border border-gray-400 px-4 py-1 text-sm pointer"
                                             >
                                                 {isFollowing ? "Following" : "Follow"}
                                             </Button>
@@ -122,8 +122,8 @@ const Profile = () => {
                             <p>
                                 {userProfile?.name}
                             </p>
-                            <p>
-                                {userProfile?.bio || "Hello Im a Fullstack Developer"}
+                            <p className='whitespace-pre-wrap text-sm text-muted-foreground'>
+                                {userProfile?.bio}
                             </p>
                         </div>
                     </div>

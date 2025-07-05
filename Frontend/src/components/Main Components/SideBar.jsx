@@ -27,7 +27,7 @@ const SideBar = () => {
     {
       text: "Profile", icon: (
         <Avatar>
-          <AvatarImage className='w-5 rounded-full' src={userData?.profilePicture} />
+          <AvatarImage className='w-5 rounded-full object-cover' src={userData?.profilePicture} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       )

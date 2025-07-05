@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import cloudinaryConfig from "./config/cloudinary.js";
+import { app, server } from "./socket/socket.js";
 
 const app = express();
 const PORT = 3000;
@@ -21,10 +22,9 @@ const corsOptions = {
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   exposedHeaders: ["Set-Cookie"],
-  maxAge: 600,
 };
 
-app.use(cors(corsOptions));       
+app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
 
 app.use(cookieParser());
@@ -35,7 +35,7 @@ app.use("/api/v1/", userRoutes);
 app.use("/api/v1/", postRoutes);
 app.use("/api/v1/", commentRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("server is running");
   dbConnect();
   cloudinaryConfig();

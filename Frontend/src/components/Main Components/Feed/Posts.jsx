@@ -47,7 +47,7 @@ export const Post = ({ post }) => {
     const userData = useSelector(state => state?.auth?.userData)
     const [commetOpen, setCommentOpen] = useState(false)
     const [commetText, setCommentText] = useState("")
-    const [isLiked, setIsLiked] = useState(post?.likes?.includes(userData?._id))
+    const isLiked = post?.likes?.includes(userData?._id)
     const dispatch = useDispatch()
 
     async function postLikeUnlike() {
@@ -55,7 +55,6 @@ export const Post = ({ post }) => {
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/like/post/${post._id}`, {}, { withCredentials: true })
             const data = response.data
             toast.success(data?.message)
-            setIsLiked((prev) => !prev)
             dispatch(updatePostLikes({ id: post._id, likes: data?.updatedPost?.likes }))
         } catch (error) {
             console.log(error);
@@ -64,7 +63,7 @@ export const Post = ({ post }) => {
 
     async function addComment(e) {
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/comment/post/${post._id}`, { comment: commetText }, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/comment/post/${post._id}`, { comment: commetText.trim() }, {
                 withCredentials: true
             });
             const data = response.data
@@ -86,7 +85,7 @@ export const Post = ({ post }) => {
                 <div className="flex gap-2 items-center mb-1">
                     <Link to={`/profile/${post?.author?._id}`}>
                         <Avatar>
-                            <AvatarImage className="w-8 h-8 rounded-full" src={post?.author?.profilePicture} />
+                            <AvatarImage className="w-8 h-8 rounded-full object-cover" src={post?.author?.profilePicture} />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                     </Link>
@@ -137,7 +136,7 @@ export const Post = ({ post }) => {
                 <Comment post={post} open={commetOpen} setCommentOpen={setCommentOpen}  ></Comment>
                 <div className="flex justify-between items-center">
                     <input value={commetText} onChange={(e) => setCommentText(e.target.value)} type="text" placeholder="add a comment" className="focus:outline-none w-full" />
-                    {commetText.length > 0 && <button onClick={(e) => addComment(e)} className="pointer text-red-700" >Post</button>}
+                    {commetText.length > 0 && <button onClick={(e) => addComment(e)} disabled={!commetText.trim()} className="pointer text-red-700" >Post</button>}
                 </div>
             </div>
         </div >

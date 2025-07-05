@@ -32,7 +32,7 @@ const CreatePost = ({ open, close }) => {
         try {
             setLoading(true)
             const formData = new FormData()
-            formData.append("caption", userInput.caption)
+            formData.append("caption", userInput.caption.trim())
             formData.append("image", userInput.image)
 
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/post`, formData, { withCredentials: true })
@@ -100,7 +100,7 @@ const CreatePost = ({ open, close }) => {
                                 accept='.png, .jpeg, .jpg'
                                 onChange={(e) => setUserInput((prev) => ({ ...prev, image: e.target.files[0] }))}
                             />
-                            <Button onClick={addPost} className='w-full pointer'>
+                            <Button variant='ghost' disabled={loading} onClick={addPost} className='w-full pointer border border-gray-600'>
                                 {
                                     loading ? <Loader2 className='animate-spin'></Loader2> : "Post"
                                 }

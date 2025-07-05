@@ -49,7 +49,7 @@ const RightSideBar = () => {
                             <div className='flex justify-between my-5'>
                                 <div className='flex items-center gap-5' key={user.id + Math.random()}>
                                     <Avatar>
-                                        <AvatarImage className="w-10 h-10 rounded-full" src={user?.profilePicture} />
+                                        <AvatarImage className="w-10 h-10 rounded-full object-cover" src={user?.profilePicture} />
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                     <p>{user?.username}</p>
