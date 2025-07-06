@@ -1,22 +1,24 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { setSuggestedUser } from '@/Redux/authSlice'
 
 const RightSideBar = () => {
 
-    const [suggestedUser, setSuggestedUser] = useState([])
+    const suggestedUsers = useSelector(state => state.auth.suggestedUsers)
     const userData = useSelector(state => state.auth.userData)
+    console.log(suggestedUsers);
 
-    console.log(suggestedUser);
 
 
+    const dispatch = useDispatch()
     async function getSuggestedUser() {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/suggestion/user`, { withCredentials: true })
             const data = response?.data
-            setSuggestedUser(data?.users)
+            dispatch(setSuggestedUser(data?.users))
         } catch (error) {
             console.log(error);
         }
@@ -44,10 +46,10 @@ const RightSideBar = () => {
             </div>
             <div>
                 {
-                    (suggestedUser || []).map((user) => (
-                        <Link to={`/profile/${user._id}`} >
+                    (suggestedUsers || []).map((user) => (
+                        <Link to={`/profile/${user._id}`} key={user?.username} >
                             <div className='flex justify-between my-5'>
-                                <div className='flex items-center gap-5' key={user.id + Math.random()}>
+                                <div className='flex items-center gap-5' >
                                     <Avatar>
                                         <AvatarImage className="w-10 h-10 rounded-full object-cover" src={user?.profilePicture} />
                                         <AvatarFallback>CN</AvatarFallback>

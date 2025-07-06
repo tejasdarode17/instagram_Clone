@@ -4,9 +4,8 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import CreatePost from './CreatePost'
+import CreatePost from '../Main Components/Feed/CreatePost'
 import { useSelector } from 'react-redux'
-import ModeToggle from '../Dark Mode/ModeToggle'
 
 
 const SideBar = () => {
@@ -60,6 +59,9 @@ const SideBar = () => {
     if (i.text === 'Home') {
       navigate(`/home`)
     }
+    if (i.text === 'Messages') {
+      navigate(`/inbox`)
+    }
   }
 
 
@@ -85,7 +87,7 @@ const SideBar = () => {
           }
         </div>
       </div>
-      
+
       <CreatePost open={createPostOpen} close={setCreatePostOpen} ></CreatePost>
     </div>
   )

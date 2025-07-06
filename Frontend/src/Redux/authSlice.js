@@ -2,7 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
     name: "auth",
-    initialState: { userData: null, userProfile: {} },
+    initialState: {
+        userData: null,
+        userProfile: {},
+        suggestedUsers: []
+    },
     reducers: {
         setuserData(state, action) {
             state.userData = action.payload;
@@ -37,9 +41,12 @@ const authSlice = createSlice({
         },
         updateUser(state, action) {
             state.userData = action.payload
+        },
+        setSuggestedUser(state, action) {
+            state.suggestedUsers = action.payload
         }
     },
 });
 
-export const { setuserData, setUserProfile, updateFollowRelationship, updateUser } = authSlice.actions;
+export const { setuserData, setUserProfile, updateFollowRelationship, updateUser, setSuggestedUser } = authSlice.actions;
 export default authSlice.reducer;

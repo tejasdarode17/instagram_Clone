@@ -3,16 +3,20 @@ import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './authSlice';
 import postReducer from './postSlice'
+import chatReducer from './chatSlice'
+import socketReducer from './socketSlice'
 
 const rootReducer = combineReducers({
     auth: authReducer,
-    posts: postReducer
+    posts: postReducer,
+    chat: chatReducer,
+    socketio: socketReducer
 });
 
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth' , 'posts'],
+    whitelist: ['auth', 'posts', 'chat', 'socketio'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

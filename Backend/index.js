@@ -8,7 +8,6 @@ import commentRoutes from "./routes/commentRoutes.js";
 import cloudinaryConfig from "./config/cloudinary.js";
 import { app, server } from "./socket/socket.js";
 
-const app = express();
 const PORT = 3000;
 
 const allowedOrigins = ["http://localhost:5173"];

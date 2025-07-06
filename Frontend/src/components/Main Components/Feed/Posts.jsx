@@ -76,9 +76,6 @@ export const Post = ({ post }) => {
         }
     }
 
-    console.log(post);
-
-
     return (
         <div className="w-[40vw] my-8">
             <div className="flex items-center my-1 justify-between">
@@ -131,7 +128,7 @@ export const Post = ({ post }) => {
                     </span>
                 </p>
                 <p>
-                    {post.comments.length > 0 && <button button onClick={() => setCommentOpen(true)} className="pointer">View all {post.comments.length} comments</button>}
+                    {post.comments.length > 0 && <button button onClick={() => setCommentOpen((prev => prev = true))} className="pointer">View all {post.comments.length} comments</button>}
                 </p>
                 <Comment post={post} open={commetOpen} setCommentOpen={setCommentOpen}  ></Comment>
                 <div className="flex justify-between items-center">

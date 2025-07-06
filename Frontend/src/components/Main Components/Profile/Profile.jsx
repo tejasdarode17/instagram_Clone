@@ -2,10 +2,10 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { Settings } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import useFollow from '../../hooks/useFollow';
+import useFollow from '../../../hooks/useFollow';
 import { setUserProfile } from '@/Redux/authSlice';
 
 const Profile = () => {

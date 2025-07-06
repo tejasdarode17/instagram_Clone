@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiCamera, FiArrowLeft } from 'react-icons/fi';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { Loader2, } from 'lucide-react';
 import { updateUser } from '@/Redux/authSlice';
 

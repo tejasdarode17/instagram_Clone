@@ -1,8 +1,8 @@
-import { Dialog, DialogContent } from '../ui/dialog'
+import { Dialog, DialogContent } from '../../ui/dialog'
 import React, { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { Ghost, Loader2, Upload } from 'lucide-react'
-import { Button } from '../ui/button'
+import {Loader2, Upload } from 'lucide-react'
+import { Button } from '../../ui/button'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useDispatch, useSelector } from 'react-redux'
