@@ -1,15 +1,35 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { setMessages } from '@/Redux/chatSlice'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
+import axios from 'axios'
 import { Search } from 'lucide-react'
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 const Messages = () => {
   const suggestedUsers = useSelector(state => state.auth.suggestedUsers)
   const userData = useSelector(state => state.auth.userData)
   const [selectedUser, setSelectedUser] = useState(null)
   const onlineUsers = useSelector(state => state.chat.onlineUsers)
+  const [textMessage, setTextMessage] = useState("")
+  const messages = useSelector(state => state.chat.messages || [])
+
+  const dispatch = useDispatch()
+
+  async function sendMessage() {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/message/${selectedUser?._id}`, { message: textMessage }, {
+        withCredentials: true
+      })
+      const data = response.data
+      console.log(data);
+      dispatch(setMessages([...messages, data?.data?.message]))
+      setTextMessage("")
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
 
   return (
@@ -76,7 +96,13 @@ const Messages = () => {
 
             {/* Messages area */}
             <div className='flex-1 p-4 overflow-y-auto bg-gray-950'>
-              {/* Messages would be rendered here */}
+              {
+                (messages || []).map((m) => (
+                  <div>
+                    <h1>{m}</h1>
+                  </div>
+                ))
+              }
             </div>
 
             {/* Message input */}
@@ -85,8 +111,10 @@ const Messages = () => {
                 <Input
                   className='flex-1 bg-gray-800 border-gray-700 text-white'
                   placeholder={`Message @${selectedUser?.username}`}
+                  onChange={(e) => setTextMessage(e.target.value)}
+                  value={textMessage}
                 />
-                <Button className='bg-blue-600 hover:bg-blue-700'>Send</Button>
+                <Button onClick={()=>sendMessage()} className='bg-blue-600 hover:bg-blue-700'>Send</Button>
               </div>
             </div>
           </div>

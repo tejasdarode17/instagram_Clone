@@ -16,7 +16,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth', 'posts', 'chat', 'socketio'],
+    whitelist: ['auth', 'posts', 'chat'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -34,6 +34,7 @@ export const store = configureStore({
                     'persist/PURGE',
                     'persist/REGISTER',
                 ],
+                ignoredPaths: ['socketio.socket'],
             },
         }),
 });

@@ -1,38 +1,66 @@
 import Conversation from "../models/conversation.model.js"
 import { Message } from "../models/message.model.js"
+import { getRecevierSocketID, io } from "../socket/socket.js"
 
-export async function sendMessage() {
-
+export async function sendMessage(req, res) {
     try {
+        const senderID = req.user.userID;
+        const receiverID = req.params.id;
+        const { message } = req.body;
 
-        const senderID = req.user.id
-        const { message } = req.body
-        const receiverID = req.params.id
+        console.log(senderID);
+        console.log(receiverID);
 
-        let conversation = Conversation.findOne({ participants: { $all: [senderID, receiverID] } })
+
+        if (!senderID || !receiverID) {
+            return res.status(401).json({
+                success: false,
+                message: "both the id's required",
+            });
+        }
+
+        let conversation = await Conversation.findOne({
+            participants: { $all: [senderID, receiverID] },
+        });
 
         if (!conversation) {
             conversation = await Conversation.create({
-                participants: [senderID, receiverID]
-            })
+                participants: [senderID, receiverID],
+            });
         }
+
 
         const newMessage = await Message.create({
             senderID,
             receiverID,
-            message
-        })
+            message,
+        });
 
-        if (newMessage) conversation.messages.push(newMessage._id);
-        await Promise.all([conversation.save(), newMessage.save()])
+
+        conversation.messages.push(newMessage._id);
+        await conversation.save();
+
+
+        const receiverSocketID = getRecevierSocketID(receiverID);
+        if (receiverSocketID) {
+            io.to(receiverSocketID).emit('newMessage', newMessage);
+        }
+
+
+        return res.status(201).json({
+            success: true,
+            data: newMessage,
+        });
 
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Server error",
+            message: 'Server error',
             error: error.message,
         });
     }
 }
+
+
 
 

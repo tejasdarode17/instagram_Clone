@@ -34,7 +34,7 @@ const RightSideBar = () => {
                 <div className='flex items-center gap-5' key={userData.id + Math.random()}>
                     <Link to={`/profile/${userData?._id}`}>
                         <Avatar>
-                            <AvatarImage className="w-8 h-8 rounded-full" src={userData?.profilePicture} />
+                            <AvatarImage className="w-8 h-8 rounded-full object-cover" src={userData?.profilePicture} />
                             <AvatarFallback>img</AvatarFallback>
                         </Avatar>
                     </Link>

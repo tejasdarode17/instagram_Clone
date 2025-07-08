@@ -5,7 +5,7 @@ const authSlice = createSlice({
     initialState: {
         userData: null,
         userProfile: {},
-        suggestedUsers: []
+        suggestedUsers: [],
     },
     reducers: {
         setuserData(state, action) {

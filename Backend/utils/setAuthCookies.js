@@ -5,7 +5,7 @@ export function setAuthCookie(res, token) {
     res.cookie("accessToken", token, {
         httpOnly: true,
         path: "/",
-        maxAge: ONE_DAY,           // 15 min – tweak to taste
+        maxAge: 24 * 60 * 60 * 1000,           // 15 min – tweak to taste
         sameSite: prod ? "None" : "Lax",  // Lax for localhost, None for HTTPS prod
         secure: prod,
     });

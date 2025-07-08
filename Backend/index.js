@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dbConnect from "./config/dbConnet.js";
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import messageRoute from './routes/messageRoute.js'
 import commentRoutes from "./routes/commentRoutes.js";
 import cloudinaryConfig from "./config/cloudinary.js";
 import { app, server } from "./socket/socket.js";
@@ -33,6 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/", postRoutes);
 app.use("/api/v1/", commentRoutes);
+app.use("/api/v1/", messageRoute);
 
 server.listen(PORT, () => {
   console.log("server is running");

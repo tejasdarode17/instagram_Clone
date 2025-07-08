@@ -1,5 +1,6 @@
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
+import { getRecevierSocketID, io } from "../socket/socket.js";
 import { uploadImage } from "../utils/imageHandler.js";
 
 export async function createPost(req, res) {
@@ -166,6 +167,7 @@ export async function likePost(req, res) {
         }
 
         const post = await Post.findById(postID);
+        const user = await User.findById(userID).select('username profilePicture')
 
         if (post.likes.includes(userID)) {
             const updatedPost = await Post.findByIdAndUpdate(postID, { $pull: { likes: userID } }, { new: true })
@@ -176,6 +178,22 @@ export async function likePost(req, res) {
             })
         } else {
             const updatedPost = await Post.findByIdAndUpdate(postID, { $addToSet: { likes: userID } }, { new: true })
+
+            //implementiing socket for live liked notification 
+            const postOwnerID = post.author.toString()  //not sending to post owner 
+            if (postOwnerID !== userID) {
+                const notification = {
+                    type: 'like',
+                    userDelails: user,
+                    message: "your post is liked",
+                    postID,
+                }
+
+                const postOwnerSocketID = getRecevierSocketID(postOwnerID)
+                io.to(postOwnerSocketID).emit('notification', notification)
+            }
+
+            
             return res.status(200).json({
                 success: true,
                 message: "Post liked",

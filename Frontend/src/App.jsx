@@ -12,6 +12,7 @@ import { useEffect } from "react"
 import { io } from "socket.io-client"
 import { setOnlineUser } from "./Redux/chatSlice"
 import { setSocket } from "./Redux/socketSlice"
+import Search from "./components/Main Components/Search"
 
 
 
@@ -66,6 +67,10 @@ const approuter = createBrowserRouter([
       {
         path: '/inbox',
         element: <Messages></Messages>
+      },
+      {
+        path: '/search',
+        element: <Search></Search>
       }
     ]
   }
@@ -85,15 +90,17 @@ function App() {
         query: {
           userID: userData._id
         },
-        transport: ['websocket']
+        transports: ['websocket']
       })
+
       dispatch(setSocket(socketio))
+
+
       //listning all the events 
       socketio.on('getOnlineUsers', (onlineUsers) => {
         dispatch(setOnlineUser(onlineUsers))
       })
-
-
+      
       return () => {
         socketio.close(),
           dispatch(setSocket(null))
