@@ -6,7 +6,7 @@ dotenv.config()
 async function verifyUser(req, res, next) {
 
     const accessToken = req.cookies.accessToken
-    
+
     if (!accessToken) {
         return res.status(401).json({
             message: "User is not authenticated",
@@ -15,10 +15,11 @@ async function verifyUser(req, res, next) {
     }
 
     try {
+        if (err) return res.status(403).json({ success: false, message: "Token expired" });
         const decoded = JWT.verify(accessToken, process.env.JWT_SECRET_KEY);
         req.user = decoded
         next()
-        
+
     } catch (error) {
         return res.status(401).json({ success: false, message: "Invalid Token", error: error.message });
     }

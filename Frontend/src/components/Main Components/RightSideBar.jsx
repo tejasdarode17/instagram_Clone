@@ -9,9 +9,6 @@ const RightSideBar = () => {
 
     const suggestedUsers = useSelector(state => state.auth.suggestedUsers)
     const userData = useSelector(state => state.auth.userData)
-    console.log(suggestedUsers);
-
-
 
     const dispatch = useDispatch()
     async function getSuggestedUser() {
@@ -28,10 +25,13 @@ const RightSideBar = () => {
     }, [])
 
 
+    
+
+
     return (
         <div className='xl:absolute right-0 top-0 Z-10 h-screen w-[25%] overflow-x-hidden overflow-y-auto'>
             <div className='my-5 flex flex-col gap-5'>
-                <div className='flex items-center gap-5' key={userData.id + Math.random()}>
+                <div className='flex items-center gap-5' key={userData?.id + Math.random()}>
                     <Link to={`/profile/${userData?._id}`}>
                         <Avatar>
                             <AvatarImage className="w-8 h-8 rounded-full object-cover" src={userData?.profilePicture} />

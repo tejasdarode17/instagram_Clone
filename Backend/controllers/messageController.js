@@ -46,10 +46,14 @@ export async function sendMessage(req, res) {
             io.to(receiverSocketID).emit('newMessage', newMessage);
         }
 
+        // const senderSocketID = getRecevierSocketID(senderID);
+        // if (senderSocketID) {
+        //     io.to(senderSocketID).emit('newMessage', newMessage);
+        // }
 
         return res.status(201).json({
             success: true,
-            data: newMessage,
+            message: newMessage,
         });
 
     } catch (error) {
@@ -60,6 +64,48 @@ export async function sendMessage(req, res) {
         });
     }
 }
+
+
+export async function getMessages(req, res) {
+
+    try {
+
+        const senderID = req.user.userID
+        const receiverID = req.params.id
+
+        if (!senderID || !receiverID) {
+            return res.status(401).json({
+                success: false,
+                message: "both the id's required",
+            });
+        }
+
+        let conversation = await Conversation.findOne({
+            participants: { $all: [senderID, receiverID] },
+        }).populate("messages")
+
+        if (!conversation) {
+            return res.status(401).json({
+                success: false,
+                message: "conversation not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            conversation
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message,
+        });
+    }
+}
+
+
 
 
 

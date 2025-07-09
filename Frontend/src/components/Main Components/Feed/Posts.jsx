@@ -45,17 +45,28 @@ const Posts = () => {
 export const Post = ({ post }) => {
 
     const userData = useSelector(state => state?.auth?.userData)
+    const postData = useSelector(state => state?.posts?.postData)
     const [commetOpen, setCommentOpen] = useState(false)
     const [commetText, setCommentText] = useState("")
-    const isLiked = post?.likes?.includes(userData?._id)
+
+
+    const currentPost = useSelector(state =>
+        state.posts.postData.find(p => p._id === post._id) || post
+    );
+    const hasLiked = (currentPost?.likes || []).some((like) => like._id === userData._id);  
+    const [isLiked, setIsLiked] = useState(hasLiked);
+
+    
     const dispatch = useDispatch()
 
     async function postLikeUnlike() {
         try {
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/like/post/${post._id}`, {}, { withCredentials: true })
             const data = response.data
-            toast.success(data?.message)
             dispatch(updatePostLikes({ id: post._id, likes: data?.updatedPost?.likes }))
+            if (data.success) {
+                setIsLiked((prev) => !prev)
+            }
         } catch (error) {
             console.log(error);
         }
@@ -69,7 +80,6 @@ export const Post = ({ post }) => {
             const data = response.data
             console.log(data);
             dispatch(updatePostComments({ postID: post._id, comment: data?.comment }))
-            toast.success(data?.message)
             setCommentText("")
         } catch (error) {
             console.log(error);

@@ -16,7 +16,11 @@ export function generateRefreshToken(payload) {
 }
 
 
-
-export async function verifyToken(params) {
-    // 
+export async function verifytoken(token) {
+    try {
+        let data = await JWT.verify(token, process.env.JWT_TOKEN)
+        return data
+    } catch (error) {
+        return false
+    }
 }

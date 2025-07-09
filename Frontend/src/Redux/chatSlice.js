@@ -13,7 +13,7 @@ const chatSlice = createSlice({
         },
         setMessages(state, action) {
             state.messages = action.payload
-        }
+        },
     }
 
 })

@@ -5,18 +5,20 @@ import authReducer from './authSlice';
 import postReducer from './postSlice'
 import chatReducer from './chatSlice'
 import socketReducer from './socketSlice'
+import notificationReducer from './notificationSlice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
     posts: postReducer,
     chat: chatReducer,
-    socketio: socketReducer
+    socketio: socketReducer,
+    notification: notificationReducer,
 });
 
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth', 'posts', 'chat'],
+    whitelist: ['auth', 'posts', 'chat', 'notification'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

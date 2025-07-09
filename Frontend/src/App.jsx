@@ -13,6 +13,7 @@ import { io } from "socket.io-client"
 import { setOnlineUser } from "./Redux/chatSlice"
 import { setSocket } from "./Redux/socketSlice"
 import Search from "./components/Main Components/Search"
+import { setLikesNotifications } from "./Redux/notificationSlice"
 
 
 
@@ -88,7 +89,7 @@ function App() {
     if (userData) {
       const socketio = io('http://localhost:3000', {
         query: {
-          userID: userData._id
+          userID: userData?._id
         },
         transports: ['websocket']
       })
@@ -100,7 +101,13 @@ function App() {
       socketio.on('getOnlineUsers', (onlineUsers) => {
         dispatch(setOnlineUser(onlineUsers))
       })
+
+      socketio.on('likeNotification', (notification) => {
+        dispatch(setLikesNotifications(notification))
+      })
+
       
+
       return () => {
         socketio.close(),
           dispatch(setSocket(null))

@@ -155,54 +155,60 @@ export async function getUserPosts(req, res) {
 
 export async function likePost(req, res) {
     try {
-
-        const postID = req.params.id
-        const userID = req.user.userID
+        const postID = req.params.id;
+        const userID = req.user.userID;
 
         if (!postID || !userID) {
             return res.status(400).json({
                 success: false,
                 message: "User token Not Provided or postID not received"
-            })
+            });
         }
 
         const post = await Post.findById(postID);
-        const user = await User.findById(userID).select('username profilePicture')
+        const user = await User.findById(userID).select('username profilePicture');
 
         if (post.likes.includes(userID)) {
-            const updatedPost = await Post.findByIdAndUpdate(postID, { $pull: { likes: userID } }, { new: true })
+            const updatedPost = await Post.findByIdAndUpdate(
+                postID,
+                { $pull: { likes: userID } },
+                { new: true }
+            );
             return res.status(200).json({
                 success: true,
                 message: "Post Unliked",
                 updatedPost
-            })
+            });
         } else {
-            const updatedPost = await Post.findByIdAndUpdate(postID, { $addToSet: { likes: userID } }, { new: true })
+            const updatedPost = await Post.findByIdAndUpdate(
+                postID,
+                { $addToSet: { likes: userID } },
+                { new: true }
+            );
 
-            //implementiing socket for live liked notification 
-            const postOwnerID = post.author.toString()  //not sending to post owner 
+            const postOwnerID = post.author.toString();
             if (postOwnerID !== userID) {
                 const notification = {
                     type: 'like',
-                    userDelails: user,
+                    userDetails: user,
                     message: "your post is liked",
                     postID,
-                }
+                };
 
-                const postOwnerSocketID = getRecevierSocketID(postOwnerID)
-                io.to(postOwnerSocketID).emit('notification', notification)
+                const postOwnerSocketID = getRecevierSocketID(postOwnerID);
+                if (postOwnerSocketID) {
+                    io.to(postOwnerSocketID).emit('likeNotification', notification);
+                }
             }
 
-            
             return res.status(200).json({
                 success: true,
                 message: "Post liked",
                 updatedPost
-            })
+            });
         }
-
     } catch (error) {
-        console.error(err);
+        console.error(error);
         return res.status(500).json({
             success: false,
             message: "Server error",
@@ -210,6 +216,7 @@ export async function likePost(req, res) {
         });
     }
 }
+
 
 export async function deletePost(req, res) {
 

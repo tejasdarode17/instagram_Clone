@@ -1,12 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { Button } from '../../ui/button';
 import { Settings } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import useFollow from '../../../hooks/useFollow';
-import { setUserProfile } from '@/Redux/authSlice';
+import { setSelectedUser, setUserProfile } from '@/Redux/authSlice';
 
 const Profile = () => {
     const userData = useSelector(state => state.auth.userData)
@@ -16,6 +16,7 @@ const Profile = () => {
     const { id } = useParams();
     const { followUser, isFollowing } = useFollow()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const loggedinUserProfile = userProfile?._id === userData?._id
 
@@ -88,7 +89,7 @@ const Profile = () => {
                                             >
                                                 {isFollowing ? "Following" : "Follow"}
                                             </Button>
-                                            <Button variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
+                                            <Button onClick={() => { dispatch(setSelectedUser(userProfile)), navigate("/inbox") }} variant="ghost" className="border border-gray-400 px-4 py-1 text-sm pointer">
                                                 Message
                                             </Button>
                                         </>

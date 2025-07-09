@@ -1,21 +1,27 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { setMessages } from '@/Redux/chatSlice'
+import { setSelectedUser } from '@/Redux/authSlice'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import axios from 'axios'
 import { Search } from 'lucide-react'
-import React, { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { setMessages } from '@/Redux/chatSlice'
 
 const Messages = () => {
   const suggestedUsers = useSelector(state => state.auth.suggestedUsers)
-  const userData = useSelector(state => state.auth.userData)
-  const [selectedUser, setSelectedUser] = useState(null)
+  const selectedUser = useSelector(state => state.auth.selectedUser)
   const onlineUsers = useSelector(state => state.chat.onlineUsers)
   const [textMessage, setTextMessage] = useState("")
+
   const messages = useSelector(state => state.chat.messages || [])
 
+  const userData = useSelector(state => state.auth.userData)
+  const socket = useSelector(state => state.socketio.socket);
+
+  const scrollRef = useRef(null);
   const dispatch = useDispatch()
+
 
   async function sendMessage() {
     try {
@@ -24,12 +30,41 @@ const Messages = () => {
       })
       const data = response.data
       console.log(data);
-      dispatch(setMessages([...messages, data?.data?.message]))
+      dispatch(setMessages([...messages, data.message]))
       setTextMessage("")
     } catch (error) {
       console.log(error);
     }
   }
+
+  async function getAllMessages() {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/messages/${selectedUser?._id}`, { withCredentials: true })
+      const data = response.data
+      dispatch(setMessages(data?.conversation?.messages || []))
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  useEffect(() => {
+    socket?.on('newMessage', (msg) => {
+      dispatch(setMessages([...messages, msg]))
+    })
+
+  }, [messages, setMessages])
+
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages]);
+
+
+  useEffect(() => {
+    dispatch(setMessages([]));
+    if (selectedUser?._id) getAllMessages();
+  }, [selectedUser?._id, dispatch]);
 
 
   return (
@@ -57,7 +92,7 @@ const Messages = () => {
             return (
               <div
                 key={user.id}
-                onClick={() => setSelectedUser(user)}
+                onClick={() => dispatch(setSelectedUser(user))}
                 className='w-full p-3 flex gap-3 hover:bg-gray-800 cursor-pointer border-b border-gray-800'
               >
                 <Avatar>
@@ -95,14 +130,16 @@ const Messages = () => {
             </div>
 
             {/* Messages area */}
-            <div className='flex-1 p-4 overflow-y-auto bg-gray-950'>
-              {
-                (messages || []).map((m) => (
-                  <div>
-                    <h1>{m}</h1>
-                  </div>
-                ))
-              }
+            <div className="flex-1 chat-scroll p-4 overflow-y-auto bg-gray-950" ref={scrollRef} >
+              {(messages || []).map((m) => (
+                <p
+                  key={m?._id}
+                  className={`mb-2 ${m?.senderID === userData?._id ? 'text-right text-blue-400' : 'text-left'
+                    }`}
+                >
+                  {m?.message}
+                </p>
+              ))}
             </div>
 
             {/* Message input */}
@@ -112,9 +149,14 @@ const Messages = () => {
                   className='flex-1 bg-gray-800 border-gray-700 text-white'
                   placeholder={`Message @${selectedUser?.username}`}
                   onChange={(e) => setTextMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      sendMessage();
+                    }
+                  }}
                   value={textMessage}
                 />
-                <Button onClick={()=>sendMessage()} className='bg-blue-600 hover:bg-blue-700'>Send</Button>
+                <Button onClick={() => sendMessage()} className='bg-blue-600 hover:bg-blue-700'>Send</Button>
               </div>
             </div>
           </div>

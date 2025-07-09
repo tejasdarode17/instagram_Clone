@@ -14,11 +14,11 @@ const io = new Server(server, {
 const userSocketMap = {}
 //all the online users will be stored here in key value format with his id 
 
+
 //this is for the realtime chat used in message Controller 
 function getRecevierSocketID(receiverID) {
     return userSocketMap[receiverID]
 }
-
 
 io.on('connection', (socket) => {
     const userID = socket.handshake.query.userID;
@@ -27,9 +27,8 @@ io.on('connection', (socket) => {
     }
 
     //event passing all the data of users to all the users in frontend 
-    io.emit('getOnlineUsers', Object.keys(userSocketMap))
-
-
+    io.emit('getOnlineUsers', Object.keys(userSocketMap))   
+    
     socket.on('disconnect', () => {
         if (userID) {
             delete userSocketMap[userID]

@@ -6,6 +6,8 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { setuserData } from "@/Redux/authSlice";
+import { useDispatch } from "react-redux";
 
 export default function Signup() {
     const [form, setForm] = useState({
@@ -19,35 +21,53 @@ export default function Signup() {
     const [showPwd, setShowPwd] = useState(false);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((p) => ({ ...p, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+
+        // Simple validations
+        const { email, password, fullname, username } = form;
+        if (!email || !password || !fullname || !username) {
+            setError("All fields are required");
+            return;
+        }
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters");
+            return;
+        }
+
         setLoading(true);
 
         try {
-            await axios.post(
-                "http://localhost:3000/api/v1/signup",
+            const { data } = await axios.post(
+                `${import.meta.env.VITE_BACKEND_URL}/signup`,
                 form,
                 { withCredentials: true }
             );
 
+            dispatch(setuserData(data?.user));
             toast.success("Welcome to Zingagram!");
             setForm({ email: "", password: "", fullname: "", username: "" });
             navigate("/home");
         } catch (err) {
-            setError(err.response?.data?.message || "Signup failed");
-            toast.error(err.response?.data?.message || "Signup failed");
+            const msg =
+                err.response?.data?.message ||
+                (err.request ? "Network error, try again" : "Signup failed");
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
     };
 
+    const allFilled = Object.values(form).every(Boolean);
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4">
@@ -65,7 +85,7 @@ export default function Signup() {
                         name="email"
                         type="email"
                         placeholder="you@example.com"
-                        className="bg-muted dark:bg-muted/40"   /* ← keeps muted bg */
+                        className="bg-muted dark:bg-muted/40"
                         value={form.email}
                         onChange={handleChange}
                         autoFocus
@@ -75,7 +95,6 @@ export default function Signup() {
                 {/* Password */}
                 <div className="space-y-1">
                     <Label htmlFor="password">Password</Label>
-
                     <div className="relative">
                         <Input
                             id="password"
@@ -132,7 +151,12 @@ export default function Signup() {
                 )}
 
                 {/* Submit */}
-                <Button type="submit" variant='ghost' className="w-full pointer border border-gray-400 bg-[#020618]" disabled={loading}>
+                <Button
+                    type="submit"
+                    variant="ghost"
+                    className="w-full pointer border border-gray-400 bg-[#020618]"
+                    disabled={loading || !allFilled}
+                >
                     {loading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing up…
